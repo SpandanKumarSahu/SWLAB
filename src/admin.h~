@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "train.h"
+
+void printPortal(){
+  printf("Welcome to Cargo Management System.\n");
+  printf("Press: \n");
+  printf("1 for Adding a train\n");
+  printf("2 for Cancelling a train\n");
+  printf("3 for Removing a train permanently.\n");
+  printf("4 for Viewing all Bookings. \n");
+  printf("5 for exit.\n");
+  printf("Your choice : ");
+}
+
+void addTrain(){
+}
+
+void cancelTrain(){
+}
+
+void removeTrain(){
+}
+
+void viewBookings(){
+}
+
+void makeChoice(int choice){
+  switch(choice){
+  case 1: 
+    addTrain();
+    break;
+  case 2:
+    cancelTrain();
+    break;
+  case 3:
+    removeTrain();
+    break;
+  case 4:
+    viewBookings();
+    break;
+  default:
+    break;
+  }
+} 
+
+int main(){
+  int choice;
+  do{
+    printPortal();
+    scanf("%d", &choice);
+    makeChoice(choice);
+  }while(choice !=5);
+  return 0;
+}
+ 

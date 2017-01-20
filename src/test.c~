@@ -1,0 +1,9 @@
+#include <stdio.h>
+
+struct node{
+  int n;
+};
+typedef struct node Node;
+
+int main(){
+  

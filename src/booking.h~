@@ -1,0 +1,145 @@
+#ifndef BOOKING_H
+#define BOOKING_H
+
+#include <stdio.h>
+#include <stdlib.h>
+#include "train.h"
+#include "mydate.h"
+#include "user.h"
+
+
+struct booking{
+  int bookingID;
+  int userID;
+  Date bookingDate;
+  Train bookedTrain;
+};
+
+typedef struct booking Booking;
+
+int postNewBookingData(Booking newBooking){
+  FILE *data;
+  if ((data = fopen("/data/bookings.bin", "a")) == NULL)
+    return 0;
+  fwrite(&newBooking,sizeof(Booking),1,data);
+  fclose(data);
+  return 3;
+}
+
+int confirmBookTrain(User user,int trainNumber,Date bookDate){
+  Train tempTrain=getTrainData(trainNumber);
+  int url;
+  FILE* data;
+  if ((data = fopen("/data/bookingID.txt", "rb")) == NULL){
+    printf("Error opening file\n");
+    return 0;
+  }
+  fread(&url, sizeof(int), 1, data);
+  fclose(data);
+  user->url=url;
+  if ((data = fopen("/data/bookingID.txt", "w")) == NULL){
+    printf("Error opening file\n");
+    return 0;
+  }
+  int tempURL=url+1;
+  fwrite(&tempURL,sizeof(int),1,data);
+  fclose(data);
+  
+  if(tempTrain.trainSchedule.days[dayofweek(bookDate.day, bookDate.month, bookDate.year)]==1){
+    FILE* data;
+    if ((data = fopen("/data/bookings.bin", "rb")) != NULL){
+      Booking tempBooking;
+      while(!feof(data)){
+	fread(&tempBooking, sizeof(Booking),1,data);
+	if(tempBooking.bookedTrain.trainNumber==trainNumber && dateEqual(tempBooking.bookingDate,bookDate)){
+	  fclose(data);
+	  return 1;
+	}
+      }
+      fclose(data);      
+    }
+    Booking newBooking;
+    newBooking.bookingID=url;
+    newBooking.userID=user.url;
+    newBooking.bookingDate=bookDate;
+    newBooking.bookedTrain=tempTrain;
+    return postNewBookingData(newBooking);
+  }
+  else{
+    return 2;
+  }
+}
+
+
+int deleteRecordByBookingID(int bookingID) {
+  FILE *fp;
+  FILE *fp_tmp;
+  int found=0;
+  Booking tempBooking;
+
+  fp=fopen("/data/bookings.bin", "rb");
+  if (!fp)
+    return 0;
+  fp_tmp=fopen("/data/tmp.bin", "wb");
+  if (!fp_tmp)
+    return 0;
+  
+  while (fread(&tempBooking,sizeof(Booking),1,fp) != NULL) {
+    if (tempBooking.bookingID==bookingID) {
+      found=1;
+    } else {
+      fwrite(&tempBooking, sizeof(Booking), 1, fp_tmp);
+    }
+  }
+  fclose(fp);
+  fclose(fp_tmp);
+
+  remove("/data/bookings.bin");
+  rename("/data/tmp.bin", "/data/bookings.bin");
+  
+  if(found)
+    return found;
+  else return 2;
+
+  return 0;
+}
+
+void printBooking(Booking tempBooking){
+  printf("%d\t%d/%d/%d\t%d\t%s\t%d:%d\t%s\t%d:%d\t%d\n",tempBooking.bookingID,tempBooking.bookingDate.day,tempBooking.bookingDate.month,tempBooking.bookingDate.year,tempBooking.bookedTrain.trainNumber,tempBooking.bookedTrain.srcStationCode,tempBooking.bookedTrain.departureTime.hours,tempBooking.bookedTrain.departureTime.minutes,tempBooking.bookedTrain.destStationCode,tempBooking.bookedTrain.arrivalTime.hours,tempBooking.bookedTrain.arrivalTime.minutes,tempBooking.bookedTrain.fare);
+}
+
+void viewBookings(User user){
+  FILE *data;
+  if((data=fopen("/data/bookings.bin","rb"))==NULL){
+    printf("Error in operations. Inconvenience Regretted.\n");
+  }
+  else{
+    Booking tempBooking;
+    printf("Your ID: %d\n", user.url);
+    printf("BookingID\tBookingDate\tTrainNumber\tSource\tDepartureTime\tDestination\tArrivalTime\tFare\n");
+    while(fread(&tempBooking,sizeof(Booking),1,data)!=NULL){
+      if(tempBookng.userID==user.url)
+	printBooking(tempBooking);
+    }
+    fclose(data);
+  }
+}
+
+void viewBookings(){
+  FILE *data;
+  if((data=fopen("/data/bookings.bin","rb"))==NULL){
+    printf("Error in operations. Inconvenience Regretted.\n");
+  }
+  else{
+    Booking tempBooking;
+    printf("Admin\n");
+    printf("BookingID\tBookingDate\tTrainNumber\tSource\tDepartureTime\tDestination\tArrivalTime\tFare\n");
+    while(fread(&tempBooking,sizeof(Booking),1,data)!=NULL){
+      printBooking(tempBooking);
+    }
+    fclose(data);
+  }
+}
+
+#endif
+

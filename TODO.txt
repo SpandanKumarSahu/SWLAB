@@ -1,0 +1,8 @@
+1. Hide the password characters. [Main.c]
+2. If the data files can't be opened, then don't blame the user/admin for inputting wrong username and password. [ Main.c][Partially Solved]
+3. Make incorrect login and other error codes into one error code file. Design an error code list.[General]
+4. Add feature to view trains by date too.[Train.h]
+6. Add option for removing train
+7. Provide option for cancelling or going back at each important points.
+8. Show bookings by sorted order of date. Show booking to be cancelled that are relevant, not all.[Booking.h]
+
